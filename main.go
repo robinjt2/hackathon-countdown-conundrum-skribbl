@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -179,12 +181,12 @@ func convertScoresToJSON(scores map[string]int) string {
 	// Encode the map to JSON bytes
 	jsonData, err := json.Marshal(scores)
 	if err != nil {
-	  return ""
+		return ""
 	}
-	
+
 	// Convert the JSON bytes to a string
 	return string(jsonData)
-  }
+}
 
 func (c *CurrentConundrum) cycleConundrums() {
 	for {
@@ -199,7 +201,7 @@ func (c *CurrentConundrum) cycleConundrums() {
 }
 
 func (c *CurrentConundrum) hintForConundrum() {
-	offsetDuration := conundrumDuration/2 * time.Second
+	offsetDuration := conundrumDuration / 2 * time.Second
 	time.Sleep(offsetDuration)
 	hintTicker = time.NewTicker(conundrumDuration * time.Second)
 	for {
@@ -250,7 +252,7 @@ func (c *CurrentConundrum) handleConnections(w http.ResponseWriter, r *http.Requ
 		}
 
 		// Check against current conundrum
-		if msg.Message == c.Get().Answer {
+		if strings.ToUpper(msg.Message) == c.Get().Answer {
 			msg = Message{msg.Username, "Guessed correctly"}
 			scores[msg.Username]++
 		}

@@ -66,7 +66,7 @@ window.onload = function () {
             if (message.username == "SusieDent") {
                 console.log("word", message.message)
                 document.getElementById('conundrumMessage').innerHTML = message.message
-                document.getElementById('conundrumHint').innerHTML = "Hint here"
+                document.getElementById('conundrumHint').innerHTML = "Hint incoming..."
             } else if (message.username == "SusieDentsAssistantThatGivesHints") {
                 console.log("hint", message.message)
                 document.getElementById('conundrumHint').innerHTML = message.message

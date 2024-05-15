@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const conundrumDuration = 30
+const conundrumDuration = 10
 
 var conundrums = []Conundrum{
 	{

@@ -10,6 +10,14 @@
     Username:
     <input type="text" id="user" size="64" />
 </form>
+<div id="leaderboard">
+    <h1>
+        Leaderboard:
+    </h1>
+    <ul id="leaderboardList">
+
+    </ul>
+</div>
 <script type="text/javascript">
 window.onload = function () {
     var conn;
@@ -20,6 +28,14 @@ window.onload = function () {
         if (doScroll) {
             log.scrollTop = log.scrollHeight - log.clientHeight;
         }
+    }
+
+    function appendLeaderboard(item) {
+        document.getElementById("leaderboardList").appendChild(item);
+    }
+
+    function clearLeaderboard(item) {
+        document.getElementById("leaderboardList").innerHTML = '';
     }
 
     document.getElementById("form").onsubmit = function () {
@@ -55,7 +71,20 @@ window.onload = function () {
                 console.log("hint", message.message)
                 document.getElementById('conundrumHint').innerHTML = message.message
             } else if (message.username == "Scores") {
-                console.log("scores", message.message)
+                clearLeaderboard()
+                const scores = JSON.parse(message.message)
+                const sortedObject = Object.entries(scores)
+                    .sort((a, b) => b[1]-a[1])
+                    .reduce((obj, [key, value]) => {
+                        obj[key] = value;
+                        return obj;
+                    }, {});
+                console.log(sortedObject)
+                for (const key in sortedObject) {
+                    var listItem = document.createElement("li");
+                    listItem.innerText = `${key}: ${sortedObject[key]}`
+                    appendLeaderboard(listItem)
+                  }
             } else {
                 var item = document.createElement("div");
                 item.innerText = `${message.username}: ${message.message}`;
@@ -90,7 +119,19 @@ body {
     position: absolute;
     top: 10em;
     left: 0.5em;
-    right: 0.5em;
+    right: 50em;
+    bottom: 3em;
+    overflow: auto;
+}
+
+#leaderboard {
+    background: white;
+    margin: 0;
+    padding: 0.5em 0.5em 0.5em 0.5em;
+    position: absolute;
+    top: 10em;
+    left: 50em;
+    right: 3em;
     bottom: 3em;
     overflow: auto;
 }

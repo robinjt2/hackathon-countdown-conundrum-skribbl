@@ -122,6 +122,7 @@ var upgrader = websocket.Upgrader{
 var clients = make(map[*websocket.Conn]bool)
 var broadcast = make(chan Message)
 var ticker *time.Ticker = time.NewTicker(30 * time.Second)
+var hintTicker *time.Ticker
 var currentConundrum = make(chan Conundrum, 1)
 
 type Conundrum struct {
@@ -159,6 +160,7 @@ func main() {
 
 	go c.handleMessages()
 	go c.cycleConundrums()
+	go c.hintForConundrum()
 
 	go fmt.Println("Server started on :8080")
 	err := http.ListenAndServe(":8080", nil)
@@ -178,6 +180,19 @@ func (c *CurrentConundrum) cycleConundrums() {
 			newConundrum := conundrums[rand.Intn(len(conundrums))]
 			c.Set(newConundrum)
 			broadcast <- Message{"SusieDent", newConundrum.Jumbled}
+		}
+	}
+}
+
+func (c *CurrentConundrum) hintForConundrum() {
+	offsetDuration := 15 * time.Second
+	time.Sleep(offsetDuration)
+	hintTicker = time.NewTicker(30 * time.Second)
+	for {
+		select {
+		case <-hintTicker.C:
+			var currentConundrum = c.Get()
+			broadcast <- Message{"SusieDentsAssistantThatGivesHints", currentConundrum.Hint}
 		}
 	}
 }

@@ -1,12 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
 	"sync"
 	"time"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -122,7 +122,7 @@ var upgrader = websocket.Upgrader{
 var clients = make(map[*websocket.Conn]bool)
 var broadcast = make(chan Message)
 var ticker *time.Ticker = time.NewTicker(30 * time.Second)
-var currentConundrum = make(chan Conundrum, 1)
+var scores = make(map[string]int)
 
 type Conundrum struct {
 	Answer  string
@@ -171,12 +171,24 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to the Chat Room!")
 }
 
+func convertScoresToJSON(scores map[string]int) string {
+	// Encode the map to JSON bytes
+	jsonData, err := json.Marshal(scores)
+	if err != nil {
+	  return ""
+	}
+	
+	// Convert the JSON bytes to a string
+	return string(jsonData)
+  }
+
 func (c *CurrentConundrum) cycleConundrums() {
 	for {
 		select {
 		case <-ticker.C:
 			newConundrum := conundrums[rand.Intn(len(conundrums))]
 			c.Set(newConundrum)
+			broadcast <- Message{"Scores", convertScoresToJSON(scores)}
 			broadcast <- Message{"SusieDent", newConundrum.Jumbled}
 		}
 	}
@@ -216,10 +228,14 @@ func (c *CurrentConundrum) handleConnections(w http.ResponseWriter, r *http.Requ
 			delete(clients, conn)
 			return
 		}
+		if _, ok := scores[msg.Username]; !ok {
+			scores[msg.Username] = 0
+		}
 
 		// Check against current conundrum
 		if msg.Message == c.Get().Answer {
 			msg = Message{msg.Username, "Guessed correctly"}
+			scores[msg.Username]++
 		}
 
 		broadcast <- msg

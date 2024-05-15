@@ -58,7 +58,7 @@ var conundrums = []Conundrum{
 	{
 		Answer:  "MUDDINESS",
 		Jumbled: "DEIUSDNSM",
-		Hint:    "Struggle without weapons",
+		Hint:    "Sloppy wet earthiness",
 	},
 	{
 		Answer:  "SLINGSHOT",

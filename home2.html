@@ -47,9 +47,17 @@ window.onload = function () {
         };
         conn.onmessage = function (evt) {
             message = JSON.parse(evt.data);
-            var item = document.createElement("div");
-            item.innerText = `${message.username}: ${message.message}`;
-            appendLog(item);
+            if (message.username == "SusieDent") {
+                console.log("word", message.message)
+            } else if (message.username == "SusieDentsAssistantThatGivesHints") {
+                console.log("hint", message.message)
+            } else if (message.username == "Scores") {
+                console.log("scores", message.message)
+            } else {
+                var item = document.createElement("div");
+                item.innerText = `${message.username}: ${message.message}`;
+                appendLog(item);
+            }
         };
     } else {
         var item = document.createElement("div");

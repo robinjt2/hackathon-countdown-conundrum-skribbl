@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const conundrumDuration = 30
+
 var conundrums = []Conundrum{
 	{
 		Answer:  "GRAPPLING",
@@ -121,7 +123,7 @@ var upgrader = websocket.Upgrader{
 
 var clients = make(map[*websocket.Conn]bool)
 var broadcast = make(chan Message)
-var ticker *time.Ticker = time.NewTicker(30 * time.Second)
+var ticker *time.Ticker = time.NewTicker(conundrumDuration * time.Second)
 var hintTicker *time.Ticker
 var scores = make(map[string]int)
 
@@ -197,9 +199,9 @@ func (c *CurrentConundrum) cycleConundrums() {
 }
 
 func (c *CurrentConundrum) hintForConundrum() {
-	offsetDuration := 15 * time.Second
+	offsetDuration := conundrumDuration/2 * time.Second
 	time.Sleep(offsetDuration)
-	hintTicker = time.NewTicker(30 * time.Second)
+	hintTicker = time.NewTicker(conundrumDuration * time.Second)
 	for {
 		select {
 		case <-hintTicker.C:
